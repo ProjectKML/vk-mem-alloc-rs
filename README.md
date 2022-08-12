@@ -27,8 +27,8 @@
 vk-mem-alloc = "0.1.0"
 ```
 
-<h3>Simple Vulkan Memory Allocator example</h3>
-````rust
+### Simple Vulkan Memory Allocator example
+```Rust
 // Create the allocator
 let allocator = vk_mem_alloc::create_allocator(&instance, physical_device, &device).unwrap();
 
@@ -51,11 +51,9 @@ vk_mem_alloc::destroy_buffer(allocator, buffer, allocation);
 
 // Destroy the allocator
 vk_mem_alloc::destroy_allocator(allocator);
-````
+```
 
-<h3>Credits</h3>
-<ul>
-    <li><a href="https://gpuopen.com/vulkan-memory-allocator/">AMD</a> for creating the Vulkan Memory Allocator.</li>
-    <li><a href="https://github.com/ash-rs/ash">The Ash community</a> for creating such an awesome rust wrapper around Vulkan.</li>
-    <li><a href="https://github.com/gwihlidal/vk-mem-rs">Graham Wihlidal</a> for creating `vk-mem`, my buildscript is based on its build script.</li>
-</ul>
+### Credits
+* [AMD](https://gpuopen.com/vulkan-memory-allocator/) for creating the Vulkan Memory Allocator.
+* [The Ash community](https://github.com/ash-rs/ash) for creating such an awesome rust wrapper around Vulkan.
+* [Graham Wihlidal](https://github.com/gwihlidal/vk-mem-rs) for creating `vk-mem`, my buildscript is based on its build script.
