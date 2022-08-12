@@ -7,9 +7,13 @@
 
 **A very lightweight wrapper around the Vulkan Memory Allocator 🦀**
 
+[![crates][crates-badge]][crates-url]
 [![license][license-badge]][license-url]
 [![vma][vma-badge]][vma-url]
 [![dependency-status][dependency-badge]][dependency-url]
+
+[crates-badge]: https://img.shields.io/crates/v/vk-mem-alloc.svg
+[crates-url]: https://crates.io/crates/vk-mem-alloc
 
 [license-badge]: https://img.shields.io/badge/License-MIT/Apache_2.0-blue.svg
 [license-url]: LICENSE-MIT
