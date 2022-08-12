@@ -19,9 +19,9 @@ include = [
     "build.rs",
     "Cargo.toml",
     "vendor/VulkanMemoryAllocator/include/vk_mem_alloc.h",
-    "vendor/Vulkan-Headers/include/vk_platform.h",
-    "vendor/Vulkan-Headers/include/vulkan_core.h",
-    "vendor/Vulkan-Headers/include/vulkan.h",
+    "vendor/Vulkan-Headers/include/vulkan/vk_platform.h",
+    "vendor/Vulkan-Headers/include/vulkan/vulkan_core.h",
+    "vendor/Vulkan-Headers/include/vulkan/vulkan.h",
     "wrapper/vma_lib.cpp",
 ]
 
