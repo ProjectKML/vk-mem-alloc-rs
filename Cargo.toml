@@ -42,3 +42,8 @@ default = []
 generate_bindings = [ "bindgen" ]
 link_vulkan = []
 recording = []
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
