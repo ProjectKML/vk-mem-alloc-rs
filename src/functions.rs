@@ -15,7 +15,7 @@ fn ffi_to_result(result: vk::Result) -> VkResult<()> {
     }
 }
 
-pub unsafe fn create_allocator(instance: &Instance, physical_device: vk::PhysicalDevice, device: &Device) -> VkResult<Allocator> {
+pub unsafe fn create_allocator(instance: &Instance, physical_device: vk::PhysicalDevice, device: &Device, allocator_create_info: Option<&AllocatorCreateInfo>) -> VkResult<Allocator> {
     unsafe extern "system" fn get_instance_proc_addr_stub(_instance: vk::Instance, _name: *const c_char) -> vk::PFN_vkVoidFunction {
         panic!("VMA_DYNAMIC_VULKAN_FUNCTIONS is unsupported")
     }
@@ -53,13 +53,19 @@ pub unsafe fn create_allocator(instance: &Instance, physical_device: vk::Physica
         vk_get_device_image_memory_requirements: device.fp_v1_3().get_device_image_memory_requirements
     };
 
-    let allocator_create_info = AllocatorCreateInfo {
-        instance: instance.handle(),
-        physical_device,
-        device: device.handle(),
-        vulkan_functions: &vulkan_functions,
-        ..Default::default()
-    };
+    let mut allocator_create_info = allocator_create_info
+        .map(|i| {
+            assert_eq!(i.instance, vk::Instance::null());
+            assert_eq!(i.physical_device, vk::PhysicalDevice::null());
+            assert_eq!(i.device, vk::Device::null());
+            assert_eq!(i.vulkan_functions, ptr::null());
+            *i
+        })
+        .unwrap_or_default();
+    allocator_create_info.instance = instance.handle();
+    allocator_create_info.physical_device = physical_device;
+    allocator_create_info.device = device.handle();
+    allocator_create_info.vulkan_functions = &vulkan_functions;
 
     create_allocator_raw(&allocator_create_info)
 }
