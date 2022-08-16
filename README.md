@@ -34,7 +34,7 @@ vk-mem-alloc = "0.1.1"
 ### Simple Vulkan Memory Allocator example
 ```Rust
 // Create the allocator
-let allocator = vk_mem_alloc::create_allocator(&instance, physical_device, &device).unwrap();
+let allocator = vk_mem_alloc::create_allocator(&instance, physical_device, &device, None).unwrap();
 
 let buffer_create_info = vk::BufferCreateInfo {
     size,
@@ -48,7 +48,7 @@ let allocation_create_info = vk_mem_alloc::AllocationCreateInfo {
 };
 
 // Create the buffer
-let (buffer, allocation, allocation_info) = vk_mem_alloc::create_buffer(allocator, &buffer_create_info, &allocation_create_info, None).unwrap();
+let (buffer, allocation, allocation_info) = vk_mem_alloc::create_buffer(allocator, &buffer_create_info, &allocation_create_info).unwrap();
 
 ....
 
