@@ -55,12 +55,12 @@ pub struct VulkanFunctions {
 
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct AllocatorCreateInfo {
+pub struct AllocatorCreateInfo<'a> {
     pub flags: AllocatorCreateFlags,
     pub physical_device: vk::PhysicalDevice,
     pub device: vk::Device,
     pub preferred_large_heap_block_size: vk::DeviceSize,
-    pub allocation_callbacks: *const vk::AllocationCallbacks,
+    pub allocation_callbacks: *const vk::AllocationCallbacks<'a>,
     pub device_memory_callbacks: *const DeviceMemoryCallbacks,
     pub heap_size_limit: *const vk::DeviceSize,
     pub vulkan_functions: *const VulkanFunctions,
@@ -69,7 +69,7 @@ pub struct AllocatorCreateInfo {
     pub type_external_memory_handle_types: *const vk::ExternalMemoryHandleTypeFlagsKHR
 }
 
-impl Default for AllocatorCreateInfo {
+impl<'a> Default for AllocatorCreateInfo<'a> {
     #[inline]
     fn default() -> Self {
         unsafe { mem::zeroed::<Self>() }
@@ -228,13 +228,13 @@ pub struct DefragmentationStats {
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
-pub struct VirtualBlockCreateInfo {
+pub struct VirtualBlockCreateInfo<'a> {
     pub size: vk::DeviceSize,
     pub flags: VirtualBlockCreateFlags,
-    pub allocation_callbacks: *const vk::AllocationCallbacks
+    pub allocation_callbacks: *const vk::AllocationCallbacks<'a>
 }
 
-impl Default for VirtualBlockCreateInfo {
+impl<'a> Default for VirtualBlockCreateInfo<'a> {
     #[inline]
     fn default() -> Self {
         unsafe { mem::zeroed::<Self>() }
