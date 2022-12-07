@@ -13,7 +13,7 @@ bitflags! {
     }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct MemoryUsage(pub u32);
 
 impl MemoryUsage {
