@@ -35,13 +35,7 @@ fn generate_bindings() {
         .generate()
         .expect("Failed to generate bindings");
 
-    let bindings_str = bindings
-        .to_string()
-        .replace(" AllocationCallbacks", " AllocationCallbacks<'a>")
-        .replace(" VmaAllocatorCreateInfo", " VmaAllocatorCreateInfo<'a>")
-        .replace(" VmaVirtualBlockCreateInfo", " VmaVirtualBlockCreateInfo<'a>")
-        .replace("vmaCreateAllocator", "vmaCreateAllocator<'a>")
-        .replace("vmaCreateVirtualBlock", "vmaCreateVirtualBlock<'a>");
+    let bindings_str = bindings.to_string();
 
     fs::create_dir_all("gen").unwrap();
     fs::write(Path::new("gen/bindings.rs"), bindings_str).expect("Failed to write bindings to file");
