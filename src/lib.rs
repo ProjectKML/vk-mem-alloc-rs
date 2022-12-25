@@ -10,6 +10,7 @@ mod enums;
 mod functions;
 mod structs;
 mod types;
+mod utils;
 
 pub use enums::*;
 pub use functions::*;

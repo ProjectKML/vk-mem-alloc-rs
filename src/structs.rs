@@ -5,15 +5,17 @@ use std::{
 
 use ash::vk;
 
-use crate::*;
+use crate::{utils::assert_size_and_align, *};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct DeviceMemoryCallbacks {
-    pub pfn_allocate: AllocateDeviceMemoryFunction,
-    pub pfn_free: FreeDeviceMemoryFunction,
+    pub pfn_allocate: PfnAllocateDeviceMemoryFunction,
+    pub pfn_free: PfnFreeDeviceMemoryFunction,
     pub user_data: *mut c_void
 }
+
+assert_size_and_align!(DeviceMemoryCallbacks, ffi::VmaDeviceMemoryCallbacks);
 
 impl Default for DeviceMemoryCallbacks {
     #[inline]
@@ -53,6 +55,8 @@ pub struct VulkanFunctions {
     pub vk_get_device_image_memory_requirements: vk::PFN_vkGetDeviceImageMemoryRequirements
 }
 
+assert_size_and_align!(VulkanFunctions, ffi::VmaVulkanFunctions);
+
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct AllocatorCreateInfo<'a> {
@@ -76,6 +80,8 @@ impl<'a> Default for AllocatorCreateInfo<'a> {
     }
 }
 
+assert_size_and_align!(AllocatorCreateInfo, ffi::VmaAllocatorCreateInfo);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct AllocatorInfo {
@@ -83,6 +89,8 @@ pub struct AllocatorInfo {
     pub physical_device: vk::PhysicalDevice,
     pub device: vk::Device
 }
+
+assert_size_and_align!(AllocatorInfo, ffi::VmaAllocatorInfo);
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
@@ -92,6 +100,8 @@ pub struct Statistics {
     pub block_bytes: vk::DeviceSize,
     pub allocation_bytes: vk::DeviceSize
 }
+
+assert_size_and_align!(Statistics, ffi::VmaStatistics);
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
@@ -104,6 +114,8 @@ pub struct DetailedStatistics {
     pub unused_range_size_max: vk::DeviceSize
 }
 
+assert_size_and_align!(DetailedStatistics, ffi::VmaDetailedStatistics);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct TotalStatistics {
@@ -112,6 +124,8 @@ pub struct TotalStatistics {
     pub total: DetailedStatistics
 }
 
+assert_size_and_align!(TotalStatistics, ffi::VmaTotalStatistics);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Budget {
@@ -119,6 +133,8 @@ pub struct Budget {
     pub usage: vk::DeviceSize,
     pub budget: vk::DeviceSize
 }
+
+assert_size_and_align!(Budget, ffi::VmaBudget);
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
@@ -140,6 +156,8 @@ impl Default for AllocationCreateInfo {
     }
 }
 
+assert_size_and_align!(AllocationCreateInfo, ffi::VmaAllocationCreateInfo);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct PoolCreateInfo {
@@ -160,6 +178,8 @@ impl Default for PoolCreateInfo {
     }
 }
 
+assert_size_and_align!(PoolCreateInfo, ffi::VmaPoolCreateInfo);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct AllocationInfo {
@@ -179,6 +199,8 @@ impl Default for AllocationInfo {
     }
 }
 
+assert_size_and_align!(AllocationInfo, ffi::VmaAllocationInfo);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct DefragmentationInfo {
@@ -187,6 +209,8 @@ pub struct DefragmentationInfo {
     pub max_bytes_per_pass: vk::DeviceSize,
     pub max_allocations_per_pass: u32
 }
+
+assert_size_and_align!(DefragmentationInfo, ffi::VmaDefragmentationInfo);
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
@@ -203,6 +227,8 @@ impl Default for DefragmentationMove {
     }
 }
 
+assert_size_and_align!(DefragmentationMove, ffi::VmaDefragmentationMove);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct DefragmentationPassMoveInfo {
@@ -217,6 +243,8 @@ impl Default for DefragmentationPassMoveInfo {
     }
 }
 
+assert_size_and_align!(DefragmentationPassMoveInfo, ffi::VmaDefragmentationPassMoveInfo);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct DefragmentationStats {
@@ -225,6 +253,8 @@ pub struct DefragmentationStats {
     pub allocations_moved: u32,
     pub device_memory_blocks_freed: u32
 }
+
+assert_size_and_align!(DefragmentationStats, ffi::VmaDefragmentationStats);
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
@@ -240,6 +270,8 @@ impl<'a> Default for VirtualBlockCreateInfo<'a> {
         unsafe { mem::zeroed() }
     }
 }
+
+assert_size_and_align!(VirtualBlockCreateInfo, ffi::VmaVirtualBlockCreateInfo);
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
@@ -257,6 +289,8 @@ impl Default for VirtualAllocationCreateInfo {
     }
 }
 
+assert_size_and_align!(VirtualAllocationCreateInfo, ffi::VmaVirtualAllocationCreateInfo);
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct VirtualAllocationInfo {
@@ -271,3 +305,5 @@ impl Default for VirtualAllocationInfo {
         unsafe { mem::zeroed() }
     }
 }
+
+assert_size_and_align!(VirtualAllocationInfo, ffi::VmaVirtualAllocationInfo);
