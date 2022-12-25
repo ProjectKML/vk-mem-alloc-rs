@@ -29,6 +29,9 @@ ash = { git = "https://github.com/ProjectKML/ash" }
 bindgen = "0.63.0"
 cc = "1.0.78"
 
+[features]
+recording = []
+
 [profile.release]
 opt-level = 3
 codegen-units = 1
