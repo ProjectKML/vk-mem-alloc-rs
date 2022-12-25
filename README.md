@@ -26,9 +26,9 @@
 
 </div>
 
-```toml
+```TOML
 [dependencies]
-vk-mem-alloc = "0.1.1"
+vk-mem-alloc = "0.2.0"
 ```
 
 ### Simple Vulkan Memory Allocator example

@@ -1,6 +1,6 @@
-[submodule "vendor/Vulkan-Headers"]
-	path = vendor/Vulkan-Headers
-	url = https://github.com/KhronosGroup/Vulkan-Headers
-[submodule "vendor/VulkanMemoryAllocator"]
-	path = vendor/VulkanMemoryAllocator
+[submodule "vk-mem-alloc-sys/vendor/VulkanMemoryAllocator"]
+	path = vk-mem-alloc-sys/vendor/VulkanMemoryAllocator
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
+[submodule "vk-mem-alloc-sys/vendor/Vulkan-Headers"]
+	path = vk-mem-alloc-sys/vendor/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers

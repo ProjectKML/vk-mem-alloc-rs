@@ -1,5 +1,6 @@
 use std::{
-    os::raw::{c_char, c_void},
+    ffi::{c_char, c_void},
+    mem::MaybeUninit,
     ptr
 };
 
@@ -8,7 +9,7 @@ use ash::{prelude::VkResult, vk, Device, Instance};
 use crate::*;
 
 #[inline]
-fn ffi_to_result(result: vk::Result) -> VkResult<()> {
+fn result_from_ffi(result: vk::Result) -> VkResult<()> {
     match result {
         vk::Result::SUCCESS => Ok(()),
         _ => Err(result)
@@ -72,12 +73,12 @@ pub unsafe fn create_allocator(instance: &Instance, physical_device: vk::Physica
 
 #[inline]
 pub unsafe fn create_allocator_raw(allocator_create_info: &AllocatorCreateInfo) -> VkResult<Allocator> {
-    let mut allocator = Allocator::null();
-    ffi_to_result(ffi::vmaCreateAllocator(
+    let mut allocator = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaCreateAllocator(
         allocator_create_info as *const AllocatorCreateInfo as *const _,
-        &mut allocator as *mut Allocator as *mut _
+        &mut allocator as *mut _ as *mut _
     ))?;
-    Ok(allocator)
+    Ok(allocator.assume_init())
 }
 
 #[inline]
@@ -87,30 +88,30 @@ pub unsafe fn destroy_allocator(allocator: Allocator) {
 
 #[inline]
 pub unsafe fn get_allocator_info(allocator: Allocator) -> AllocatorInfo {
-    let mut allocator_info = AllocatorInfo::default();
-    ffi::vmaGetAllocatorInfo(allocator.as_raw() as _, &mut allocator_info as *mut AllocatorInfo as *mut _);
-    allocator_info
+    let mut allocator_info = MaybeUninit::uninit();
+    ffi::vmaGetAllocatorInfo(allocator.as_raw() as _, &mut allocator_info as *mut _ as *mut _);
+    allocator_info.assume_init()
 }
 
 #[inline]
 pub unsafe fn get_physical_device_properties(allocator: Allocator) -> *const vk::PhysicalDeviceProperties {
-    let mut physical_device_properties = ptr::null::<vk::PhysicalDeviceProperties>();
-    ffi::vmaGetPhysicalDeviceProperties(allocator.as_raw() as _, &mut physical_device_properties);
-    physical_device_properties
+    let mut physical_device_properties = MaybeUninit::uninit();
+    ffi::vmaGetPhysicalDeviceProperties(allocator.as_raw() as _, &mut physical_device_properties as *mut _ as *mut _);
+    physical_device_properties.assume_init()
 }
 
 #[inline]
 pub unsafe fn get_memory_properties(allocator: Allocator) -> *const vk::PhysicalDeviceMemoryProperties {
-    let mut memory_properties = ptr::null::<vk::PhysicalDeviceMemoryProperties>();
-    ffi::vmaGetMemoryProperties(allocator.as_raw() as _, &mut memory_properties);
-    memory_properties
+    let mut memory_properties = MaybeUninit::uninit();
+    ffi::vmaGetMemoryProperties(allocator.as_raw() as _, &mut memory_properties as *mut _ as *mut _);
+    memory_properties.assume_init()
 }
 
 #[inline]
 pub unsafe fn get_memory_type_properties(allocator: Allocator, memory_type_index: u32) -> vk::MemoryPropertyFlags {
-    let mut memory_property_flags = vk::MemoryPropertyFlags::empty();
-    ffi::vmaGetMemoryTypeProperties(allocator.as_raw() as _, memory_type_index, &mut memory_property_flags);
-    memory_property_flags
+    let mut memory_property_flags = MaybeUninit::uninit();
+    ffi::vmaGetMemoryTypeProperties(allocator.as_raw() as _, memory_type_index, &mut memory_property_flags as *mut _ as *mut _);
+    memory_property_flags.assume_init()
 }
 
 #[inline]
@@ -120,9 +121,9 @@ pub unsafe fn set_current_frame_index(allocator: Allocator, frame_index: u32) {
 
 #[inline]
 pub unsafe fn calculate_statistics(allocator: Allocator) -> TotalStatistics {
-    let mut total_statistics = TotalStatistics::default();
-    ffi::vmaCalculateStatistics(allocator.as_raw() as _, &mut total_statistics as *const TotalStatistics as _);
-    total_statistics
+    let mut total_statistics = MaybeUninit::uninit();
+    ffi::vmaCalculateStatistics(allocator.as_raw() as _, &mut total_statistics as *mut _ as *mut _);
+    total_statistics.assume_init()
 }
 
 #[inline]
@@ -138,49 +139,49 @@ pub unsafe fn get_heap_budgets(allocator: Allocator) -> Vec<Budget> {
 
 #[inline]
 pub unsafe fn find_memory_type_index(allocator: Allocator, memory_type_bits: u32, allocation_create_info: &AllocationCreateInfo) -> VkResult<u32> {
-    let mut memory_type_index = 0;
-    ffi_to_result(ffi::vmaFindMemoryTypeIndex(
+    let mut memory_type_index = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaFindMemoryTypeIndex(
         allocator.as_raw() as _,
         memory_type_bits,
         allocation_create_info as *const AllocationCreateInfo as *const _,
-        &mut memory_type_index
+        &mut memory_type_index as *mut _ as *mut _
     ))?;
-    Ok(memory_type_index)
+    Ok(memory_type_index.assume_init())
 }
 
 #[inline]
 pub unsafe fn find_memory_type_index_for_buffer_info(allocator: Allocator, buffer_create_info: &vk::BufferCreateInfo, allocation_create_info: &AllocationCreateInfo) -> VkResult<u32> {
-    let mut memory_type_index = 0;
-    ffi_to_result(ffi::vmaFindMemoryTypeIndexForBufferInfo(
+    let mut memory_type_index = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaFindMemoryTypeIndexForBufferInfo(
         allocator.as_raw() as _,
         buffer_create_info as *const _,
         allocation_create_info as *const AllocationCreateInfo as *const _,
-        &mut memory_type_index
+        &mut memory_type_index as *mut _ as *mut _
     ))?;
-    Ok(memory_type_index)
+    Ok(memory_type_index.assume_init())
 }
 
 #[inline]
 pub unsafe fn find_memory_type_index_for_image_info(allocator: Allocator, image_create_info: &vk::ImageCreateInfo, allocation_create_info: &AllocationCreateInfo) -> VkResult<u32> {
-    let mut memory_type_index = 0;
-    ffi_to_result(ffi::vmaFindMemoryTypeIndexForImageInfo(
+    let mut memory_type_index = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaFindMemoryTypeIndexForImageInfo(
         allocator.as_raw() as _,
         image_create_info as *const _,
         allocation_create_info as *const AllocationCreateInfo as *const _,
-        &mut memory_type_index
+        &mut memory_type_index as *mut _ as *mut _
     ))?;
-    Ok(memory_type_index)
+    Ok(memory_type_index.assume_init())
 }
 
 #[inline]
 pub unsafe fn create_pool(allocator: Allocator, create_info: &PoolCreateInfo) -> VkResult<Pool> {
-    let mut pool = Pool::null();
-    ffi_to_result(ffi::vmaCreatePool(
+    let mut pool = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaCreatePool(
         allocator.as_raw() as _,
         create_info as *const PoolCreateInfo as *const _,
-        &mut pool as *mut Pool as *mut _
+        &mut pool as *mut _ as *mut _
     ))?;
-    Ok(pool)
+    Ok(pool.assume_init())
 }
 
 #[inline]
@@ -190,28 +191,28 @@ pub unsafe fn destroy_pool(allocator: Allocator, pool: Pool) {
 
 #[inline]
 pub unsafe fn get_pool_statistics(allocator: Allocator, pool: Pool) -> Statistics {
-    let mut statistics = Statistics::default();
-    ffi::vmaGetPoolStatistics(allocator.as_raw() as _, pool.as_raw() as _, &mut statistics as *mut Statistics as *mut _);
-    statistics
+    let mut statistics = MaybeUninit::uninit();
+    ffi::vmaGetPoolStatistics(allocator.as_raw() as _, pool.as_raw() as _, &mut statistics as *mut _ as *mut _);
+    statistics.assume_init()
 }
 
 #[inline]
 pub unsafe fn calculate_pool_statistics(allocator: Allocator) -> DetailedStatistics {
-    let mut statistics = DetailedStatistics::default();
-    ffi::vmaCalculateStatistics(allocator.as_raw() as _, &mut statistics as *mut DetailedStatistics as *mut _);
-    statistics
+    let mut statistics = MaybeUninit::uninit();
+    ffi::vmaCalculateStatistics(allocator.as_raw() as _, &mut statistics as *mut _ as *mut _);
+    statistics.assume_init()
 }
 
 #[inline]
 pub unsafe fn check_pool_corruption(allocator: Allocator, pool: Pool) -> VkResult<()> {
-    ffi_to_result(ffi::vmaCheckPoolCorruption(allocator.as_raw() as _, pool.as_raw() as _))
+    result_from_ffi(ffi::vmaCheckPoolCorruption(allocator.as_raw() as _, pool.as_raw() as _))
 }
 
 #[inline]
 pub unsafe fn get_pool_name(allocator: Allocator, pool: Pool) -> *const c_char {
-    let mut name = ptr::null::<c_char>();
-    ffi::vmaGetPoolName(allocator.as_raw() as _, pool.as_raw() as _, &mut name);
-    name
+    let mut name = MaybeUninit::uninit();
+    ffi::vmaGetPoolName(allocator.as_raw() as _, pool.as_raw() as _, &mut name as *mut _ as *mut _);
+    name.assume_init()
 }
 
 #[inline]
@@ -221,16 +222,16 @@ pub unsafe fn set_pool_name(allocator: Allocator, pool: Pool, name: *const c_cha
 
 #[inline]
 pub unsafe fn allocate_memory(allocator: Allocator, memory_requirements: &vk::MemoryRequirements, create_info: &AllocationCreateInfo) -> VkResult<(Allocation, AllocationInfo)> {
-    let mut allocation = Allocation::null();
-    let mut allocation_info = AllocationInfo::default();
-    ffi_to_result(ffi::vmaAllocateMemory(
+    let mut allocation = MaybeUninit::uninit();
+    let mut allocation_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaAllocateMemory(
         allocator.as_raw() as _,
-        memory_requirements as *const vk::MemoryRequirements as *const _,
-        create_info as *const AllocationCreateInfo as *const _,
-        &mut allocation as *mut Allocation as *mut _,
-        &mut allocation_info as *mut AllocationInfo as *mut _
+        memory_requirements as *const _ as *const _,
+        create_info as *const _ as *const _,
+        &mut allocation as *mut _ as *mut _,
+        &mut allocation_info as *mut _ as *mut _
     ))?;
-    Ok((allocation, allocation_info))
+    Ok((allocation.assume_init(), allocation_info.assume_init()))
 }
 
 #[inline]
@@ -240,45 +241,45 @@ pub unsafe fn allocate_memory_pages(
     create_info: &AllocationCreateInfo,
     allocation_count: usize
 ) -> VkResult<(Allocation, AllocationInfo)> {
-    let mut allocation = Allocation::null();
-    let mut allocation_info = AllocationInfo::default();
-    ffi_to_result(ffi::vmaAllocateMemoryPages(
+    let mut allocation = MaybeUninit::uninit();
+    let mut allocation_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaAllocateMemoryPages(
         allocator.as_raw() as _,
-        memory_requirements as *const vk::MemoryRequirements as *const _,
-        create_info as *const AllocationCreateInfo as *const _,
+        memory_requirements as *const _ as *const _,
+        create_info as *const _ as *const _,
         allocation_count,
-        &mut allocation as *mut Allocation as *mut _,
-        &mut allocation_info as *mut AllocationInfo as *mut _
+        &mut allocation as *mut _ as *mut _,
+        &mut allocation_info as *mut _ as *mut _
     ))?;
-    Ok((allocation, allocation_info))
+    Ok((allocation.assume_init(), allocation_info.assume_init()))
 }
 
 #[inline]
 pub unsafe fn allocate_memory_for_buffer(allocator: Allocator, buffer: vk::Buffer, create_info: *const AllocationCreateInfo) -> VkResult<(Allocation, AllocationInfo)> {
-    let mut allocation = Allocation::null();
-    let mut allocation_info = AllocationInfo::default();
-    ffi_to_result(ffi::vmaAllocateMemoryForBuffer(
+    let mut allocation = MaybeUninit::uninit();
+    let mut allocation_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaAllocateMemoryForBuffer(
         allocator.as_raw() as _,
         buffer,
-        create_info as *const AllocationCreateInfo as *const _,
-        &mut allocation as *mut Allocation as *mut _,
-        &mut allocation_info as *mut AllocationInfo as *mut _
+        create_info as *const _ as *const _,
+        &mut allocation as *mut _ as *mut _,
+        &mut allocation_info as *mut _ as *mut _
     ))?;
-    Ok((allocation, allocation_info))
+    Ok((allocation.assume_init(), allocation_info.assume_init()))
 }
 
 #[inline]
 pub unsafe fn allocate_memory_for_image(allocator: Allocator, image: vk::Image, create_info: *const AllocationCreateInfo) -> VkResult<(Allocation, AllocationInfo)> {
-    let mut allocation = Allocation::null();
-    let mut allocation_info = AllocationInfo::default();
-    ffi_to_result(ffi::vmaAllocateMemoryForImage(
+    let mut allocation = MaybeUninit::uninit();
+    let mut allocation_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaAllocateMemoryForImage(
         allocator.as_raw() as _,
         image,
-        create_info as *const AllocationCreateInfo as *const _,
-        &mut allocation as *mut Allocation as *mut _,
-        &mut allocation_info as *mut AllocationInfo as *mut _
+        create_info as *const _ as *const _,
+        &mut allocation as *mut _ as *mut _,
+        &mut allocation_info as *mut _ as *mut _
     ))?;
-    Ok((allocation, allocation_info))
+    Ok((allocation.assume_init(), allocation_info.assume_init()))
 }
 
 #[inline]
@@ -288,9 +289,9 @@ pub unsafe fn free_memory_pages(allocator: Allocator, allocation_count: usize, a
 
 #[inline]
 pub unsafe fn get_allocation_info(allocator: Allocator, allocation: Allocation) -> AllocationInfo {
-    let mut allocation_info = AllocationInfo::default();
-    ffi::vmaGetAllocationInfo(allocator.as_raw() as _, allocation.as_raw() as _, &mut allocation_info as *mut AllocationInfo as *mut _);
-    allocation_info
+    let mut allocation_info = MaybeUninit::uninit();
+    ffi::vmaGetAllocationInfo(allocator.as_raw() as _, allocation.as_raw() as _, &mut allocation_info as *mut _ as *mut _);
+    allocation_info.assume_init()
 }
 
 #[inline]
@@ -305,16 +306,16 @@ pub unsafe fn set_allocation_name(allocator: Allocator, allocation: Allocation, 
 
 #[inline]
 pub unsafe fn get_allocation_memory_properties(allocator: Allocator, allocation: Allocation) -> vk::MemoryPropertyFlags {
-    let mut memory_property_flags = vk::MemoryPropertyFlags::empty();
-    ffi::vmaGetAllocationMemoryProperties(allocator.as_raw() as _, allocation.as_raw() as _, &mut memory_property_flags);
-    memory_property_flags
+    let mut memory_property_flags = MaybeUninit::uninit();
+    ffi::vmaGetAllocationMemoryProperties(allocator.as_raw() as _, allocation.as_raw() as _, &mut memory_property_flags as *mut _ as *mut _);
+    memory_property_flags.assume_init()
 }
 
 #[inline]
 pub unsafe fn map_memory(allocator: Allocator, allocation: Allocation) -> VkResult<*mut c_void> {
-    let mut data = ptr::null_mut::<c_void>();
-    ffi_to_result(ffi::vmaMapMemory(allocator.as_raw() as _, allocation.as_raw() as _, &mut data))?;
-    Ok(data)
+    let mut data = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaMapMemory(allocator.as_raw() as _, allocation.as_raw() as _, &mut data as *mut _ as *mut _))?;
+    Ok(data.assume_init())
 }
 
 #[inline]
@@ -324,17 +325,17 @@ pub unsafe fn unmap_memory(allocator: Allocator, allocation: Allocation) {
 
 #[inline]
 pub unsafe fn flush_allocation(allocator: Allocator, allocation: Allocation, offset: vk::DeviceSize, size: vk::DeviceSize) -> VkResult<()> {
-    ffi_to_result(ffi::vmaFlushAllocation(allocator.as_raw() as _, allocation.as_raw() as _, offset, size))
+    result_from_ffi(ffi::vmaFlushAllocation(allocator.as_raw() as _, allocation.as_raw() as _, offset, size))
 }
 
 #[inline]
 pub unsafe fn invalidate_allocation(allocator: Allocator, allocation: Allocation, offset: vk::DeviceSize, size: vk::DeviceSize) -> VkResult<()> {
-    ffi_to_result(ffi::vmaInvalidateAllocation(allocator.as_raw() as _, allocation.as_raw() as _, offset, size))
+    result_from_ffi(ffi::vmaInvalidateAllocation(allocator.as_raw() as _, allocation.as_raw() as _, offset, size))
 }
 
 #[inline]
 pub unsafe fn flush_allocations(allocator: Allocator, allocation_count: u32, allocations: *mut Allocation, offsets: *const vk::DeviceSize, sizes: *const vk::DeviceSize) -> VkResult<()> {
-    ffi_to_result(ffi::vmaFlushAllocations(allocator.as_raw() as _, allocation_count, allocations.cast(), offsets, sizes))
+    result_from_ffi(ffi::vmaFlushAllocations(allocator.as_raw() as _, allocation_count, allocations.cast(), offsets, sizes))
 }
 
 #[inline]
@@ -345,62 +346,62 @@ pub unsafe fn invalidate_allocations(
     offsets: *const vk::DeviceSize,
     sizes: *const vk::DeviceSize
 ) -> VkResult<()> {
-    ffi_to_result(ffi::vmaInvalidateAllocations(allocator.as_raw() as _, allocation_count, allocations.cast(), offsets, sizes))
+    result_from_ffi(ffi::vmaInvalidateAllocations(allocator.as_raw() as _, allocation_count, allocations.cast(), offsets, sizes))
 }
 
 #[inline]
 pub unsafe fn check_corruption(allocator: Allocator, memory_type_bits: u32) -> VkResult<()> {
-    ffi_to_result(ffi::vmaCheckCorruption(allocator.as_raw() as _, memory_type_bits))
+    result_from_ffi(ffi::vmaCheckCorruption(allocator.as_raw() as _, memory_type_bits))
 }
 
 #[inline]
 pub unsafe fn begin_defragmentation(allocator: Allocator, info: &DefragmentationInfo) -> VkResult<DefragmentationContext> {
-    let mut defragmentation_context = DefragmentationContext::default();
-    ffi_to_result(ffi::vmaBeginDefragmentation(
+    let mut defragmentation_context = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaBeginDefragmentation(
         allocator.as_raw() as _,
-        info as *const DefragmentationInfo as *const _,
-        &mut defragmentation_context as *mut DefragmentationContext as *mut _
+        info as *const _ as *const _,
+        &mut defragmentation_context as *mut _ as *mut _
     ))?;
-    Ok(defragmentation_context)
+    Ok(defragmentation_context.assume_init())
 }
 
 #[inline]
 pub unsafe fn end_defragmentation(allocator: Allocator, context: DefragmentationContext) -> DefragmentationStats {
-    let mut defragmentation_stats = DefragmentationStats::default();
-    ffi::vmaEndDefragmentation(allocator.as_raw() as _, context.as_raw() as _, &mut defragmentation_stats as *mut DefragmentationStats as *mut _);
-    defragmentation_stats
+    let mut defragmentation_stats = MaybeUninit::uninit();
+    ffi::vmaEndDefragmentation(allocator.as_raw() as _, context.as_raw() as _, &mut defragmentation_stats as *mut _ as *mut _);
+    defragmentation_stats.assume_init()
 }
 
 #[inline]
 pub unsafe fn begin_defragmentation_pass(allocator: Allocator, context: DefragmentationContext) -> VkResult<DefragmentationPassMoveInfo> {
-    let mut defragmentation_pass_move_info = DefragmentationPassMoveInfo::default();
-    ffi_to_result(ffi::vmaBeginDefragmentationPass(
+    let mut defragmentation_pass_move_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaBeginDefragmentationPass(
         allocator.as_raw() as _,
         context.as_raw() as _,
-        &mut defragmentation_pass_move_info as *mut DefragmentationPassMoveInfo as *mut _
+        &mut defragmentation_pass_move_info as *mut _ as *mut _
     ))?;
-    Ok(defragmentation_pass_move_info)
+    Ok(defragmentation_pass_move_info.assume_init())
 }
 
 #[inline]
 pub unsafe fn end_defragmentation_pass(allocator: Allocator, context: DefragmentationContext) -> VkResult<DefragmentationPassMoveInfo> {
-    let mut defragmentation_pass_move_info = DefragmentationPassMoveInfo::default();
-    ffi_to_result(ffi::vmaEndDefragmentationPass(
+    let mut defragmentation_pass_move_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaEndDefragmentationPass(
         allocator.as_raw() as _,
         context.as_raw() as _,
-        &mut defragmentation_pass_move_info as *mut DefragmentationPassMoveInfo as *mut _
+        &mut defragmentation_pass_move_info as *mut _ as *mut _
     ))?;
-    Ok(defragmentation_pass_move_info)
+    Ok(defragmentation_pass_move_info.assume_init())
 }
 
 #[inline]
 pub unsafe fn bind_buffer_memory(allocator: Allocator, allocation: Allocation, buffer: vk::Buffer) -> VkResult<()> {
-    ffi_to_result(ffi::vmaBindBufferMemory(allocator.as_raw() as _, allocation.as_raw() as _, buffer))
+    result_from_ffi(ffi::vmaBindBufferMemory(allocator.as_raw() as _, allocation.as_raw() as _, buffer))
 }
 
 #[inline]
 pub unsafe fn bind_buffer_memory2(allocator: Allocator, allocation: Allocation, allocation_local_offset: vk::DeviceSize, buffer: vk::Buffer, next: *const c_void) -> VkResult<()> {
-    ffi_to_result(ffi::vmaBindBufferMemory2(
+    result_from_ffi(ffi::vmaBindBufferMemory2(
         allocator.as_raw() as _,
         allocation.as_raw() as _,
         allocation_local_offset,
@@ -411,12 +412,12 @@ pub unsafe fn bind_buffer_memory2(allocator: Allocator, allocation: Allocation, 
 
 #[inline]
 pub unsafe fn bind_image_memory(allocator: Allocator, allocation: Allocation, image: vk::Image) -> VkResult<()> {
-    ffi_to_result(ffi::vmaBindImageMemory(allocator.as_raw() as _, allocation.as_raw() as _, image))
+    result_from_ffi(ffi::vmaBindImageMemory(allocator.as_raw() as _, allocation.as_raw() as _, image))
 }
 
 #[inline]
 pub unsafe fn bind_image_memory2(allocator: Allocator, allocation: Allocation, allocation_local_offset: vk::DeviceSize, image: vk::Image, next: *const c_void) -> VkResult<()> {
-    ffi_to_result(ffi::vmaBindImageMemory2(allocator.as_raw() as _, allocation.as_raw() as _, allocation_local_offset, image, next))
+    result_from_ffi(ffi::vmaBindImageMemory2(allocator.as_raw() as _, allocation.as_raw() as _, allocation_local_offset, image, next))
 }
 
 #[inline]
@@ -425,18 +426,18 @@ pub unsafe fn create_buffer(
     buffer_create_info: &vk::BufferCreateInfo,
     allocation_create_info: &AllocationCreateInfo
 ) -> VkResult<(vk::Buffer, Allocation, AllocationInfo)> {
-    let mut buffer = vk::Buffer::null();
-    let mut allocation = Allocation::null();
-    let mut allocation_info = AllocationInfo::default();
-    ffi_to_result(ffi::vmaCreateBuffer(
+    let mut buffer = MaybeUninit::uninit();
+    let mut allocation = MaybeUninit::uninit();
+    let mut allocation_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaCreateBuffer(
         allocator.as_raw() as _,
         buffer_create_info as *const _,
-        allocation_create_info as *const AllocationCreateInfo as *const _,
-        &mut buffer,
-        &mut allocation as *mut Allocation as *mut _,
-        &mut allocation_info as *mut AllocationInfo as *mut _
+        allocation_create_info as *const _ as *const _,
+        &mut buffer as *mut _ as *mut _,
+        &mut allocation as *mut _ as *mut _,
+        &mut allocation_info as *mut _ as *mut _
     ))?;
-    Ok((buffer, allocation, allocation_info))
+    Ok((buffer.assume_init(), allocation.assume_init(), allocation_info.assume_init()))
 }
 
 #[inline]
@@ -446,31 +447,31 @@ pub unsafe fn create_buffer_with_alignment(
     allocation_create_info: &AllocationCreateInfo,
     min_alignment: vk::DeviceSize
 ) -> VkResult<(vk::Buffer, Allocation, AllocationInfo)> {
-    let mut buffer = vk::Buffer::null();
-    let mut allocation = Allocation::null();
-    let mut allocation_info = AllocationInfo::default();
-    ffi_to_result(ffi::vmaCreateBufferWithAlignment(
+    let mut buffer = MaybeUninit::uninit();
+    let mut allocation = MaybeUninit::uninit();
+    let mut allocation_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaCreateBufferWithAlignment(
         allocator.as_raw() as _,
         buffer_create_info as *const _,
         allocation_create_info as *const AllocationCreateInfo as *const _,
         min_alignment,
-        &mut buffer,
-        &mut allocation as *mut Allocation as *mut _,
-        &mut allocation_info as *mut AllocationInfo as *mut _
+        &mut buffer as *mut _ as *mut _,
+        &mut allocation as *mut _ as *mut _,
+        &mut allocation_info as *mut _ as *mut _
     ))?;
-    Ok((buffer, allocation, allocation_info))
+    Ok((buffer.assume_init(), allocation.assume_init(), allocation_info.assume_init()))
 }
 
 #[inline]
 pub unsafe fn create_aliasing_buffer(allocator: Allocator, allocation: Allocation, buffer_create_info: &vk::BufferCreateInfo) -> VkResult<vk::Buffer> {
-    let mut buffer = vk::Buffer::null();
-    ffi_to_result(ffi::vmaCreateAliasingBuffer(
+    let mut buffer = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaCreateAliasingBuffer(
         allocator.as_raw() as _,
         allocation.as_raw() as _,
         buffer_create_info as *const _,
-        &mut buffer
+        &mut buffer as *mut _ as *mut _
     ))?;
-    Ok(buffer)
+    Ok(buffer.assume_init())
 }
 
 #[inline]
@@ -484,30 +485,30 @@ pub unsafe fn create_image(
     image_create_info: &vk::ImageCreateInfo,
     allocation_create_info: &AllocationCreateInfo
 ) -> VkResult<(vk::Image, Allocation, AllocationInfo)> {
-    let mut image = vk::Image::null();
-    let mut allocation = Allocation::null();
-    let mut allocation_info = AllocationInfo::default();
-    ffi_to_result(ffi::vmaCreateImage(
+    let mut image = MaybeUninit::uninit();
+    let mut allocation = MaybeUninit::uninit();
+    let mut allocation_info = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaCreateImage(
         allocator.as_raw() as _,
         image_create_info as *const _,
         allocation_create_info as *const AllocationCreateInfo as *const _,
-        &mut image,
-        &mut allocation as *mut Allocation as *mut _,
-        &mut allocation_info as *mut AllocationInfo as *mut _
+        &mut image as *mut _ as *mut _,
+        &mut allocation as *mut _ as *mut _,
+        &mut allocation_info as *mut _ as *mut _
     ))?;
-    Ok((image, allocation, allocation_info))
+    Ok((image.assume_init(), allocation.assume_init(), allocation_info.assume_init()))
 }
 
 #[inline]
 pub unsafe fn create_aliasing_image(allocator: Allocator, allocation: Allocation, image_create_info: &vk::ImageCreateInfo) -> VkResult<vk::Image> {
-    let mut image = vk::Image::null();
-    ffi_to_result(ffi::vmaCreateAliasingImage(
+    let mut image = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaCreateAliasingImage(
         allocator.as_raw() as _,
         allocation.as_raw() as _,
         image_create_info as *const _,
-        &mut image
+        &mut image as *mut _ as *mut _
     ))?;
-    Ok(image)
+    Ok(image.assume_init())
 }
 
 #[inline]
@@ -517,12 +518,9 @@ pub unsafe fn destroy_image(allocator: Allocator, image: vk::Image, allocation: 
 
 #[inline]
 pub unsafe fn create_virtual_block(create_info: &VirtualBlockCreateInfo) -> VkResult<VirtualBlock> {
-    let mut virtual_block = VirtualBlock::null();
-    ffi_to_result(ffi::vmaCreateVirtualBlock(
-        create_info as *const VirtualBlockCreateInfo as *const _,
-        &mut virtual_block as *mut VirtualBlock as *mut _
-    ))?;
-    Ok(virtual_block)
+    let mut virtual_block = MaybeUninit::uninit();
+    result_from_ffi(ffi::vmaCreateVirtualBlock(create_info as *const _ as *const _, &mut virtual_block as *mut _ as *mut _))?;
+    Ok(virtual_block.assume_init())
 }
 
 #[inline]
@@ -537,26 +535,22 @@ pub unsafe fn is_virtual_block_empty(virtual_block: VirtualBlock) -> bool {
 
 #[inline]
 pub unsafe fn get_virtual_allocation_info(virtual_block: VirtualBlock, allocation: VirtualAllocation) -> VirtualAllocationInfo {
-    let mut virtual_alloc_info = VirtualAllocationInfo::default();
-    ffi::vmaGetVirtualAllocationInfo(
-        virtual_block.as_raw() as _,
-        allocation.as_raw() as _,
-        &mut virtual_alloc_info as *mut VirtualAllocationInfo as *mut _
-    );
-    virtual_alloc_info
+    let mut virtual_alloc_info = MaybeUninit::uninit();
+    ffi::vmaGetVirtualAllocationInfo(virtual_block.as_raw() as _, allocation.as_raw() as _, &mut virtual_alloc_info as *mut _ as *mut _);
+    virtual_alloc_info.assume_init()
 }
 
 #[inline]
 pub unsafe fn virtual_allocate(virtual_block: VirtualBlock, create_info: &VirtualAllocationCreateInfo) -> VkResult<(VirtualAllocation, vk::DeviceSize)> {
-    let mut allocation = VirtualAllocation::null();
+    let mut allocation = MaybeUninit::uninit();
     let mut offset = 0;
-    ffi_to_result(ffi::vmaVirtualAllocate(
+    result_from_ffi(ffi::vmaVirtualAllocate(
         virtual_block.as_raw() as _,
-        create_info as *const VirtualAllocationCreateInfo as *const _,
-        &mut allocation as *mut VirtualAllocation as *mut _,
+        create_info as *const _ as *const _,
+        &mut allocation as *mut _ as *mut _,
         &mut offset
     ))?;
-    Ok((allocation, offset))
+    Ok((allocation.assume_init(), offset))
 }
 
 #[inline]
@@ -576,23 +570,23 @@ pub unsafe fn set_virtual_allocation_user_data(virtual_block: VirtualBlock, allo
 
 #[inline]
 pub unsafe fn get_virtual_block_statistics(virtual_block: VirtualBlock) -> Statistics {
-    let mut statistics = Statistics::default();
-    ffi::vmaGetVirtualBlockStatistics(virtual_block.as_raw() as _, &mut statistics as *mut Statistics as *mut _);
-    statistics
+    let mut statistics = MaybeUninit::uninit();
+    ffi::vmaGetVirtualBlockStatistics(virtual_block.as_raw() as _, &mut statistics as *mut _ as *mut _);
+    statistics.assume_init()
 }
 
 #[inline]
 pub unsafe fn calculate_virtual_block_statistics(virtual_block: VirtualBlock) -> DetailedStatistics {
-    let mut statistics = DetailedStatistics::default();
-    ffi::vmaCalculateVirtualBlockStatistics(virtual_block.as_raw() as _, &mut statistics as *mut DetailedStatistics as *mut _);
-    statistics
+    let mut statistics = MaybeUninit::uninit();
+    ffi::vmaCalculateVirtualBlockStatistics(virtual_block.as_raw() as _, &mut statistics as *mut _ as *mut _);
+    statistics.assume_init()
 }
 
 #[inline]
 pub unsafe fn build_virtual_block_stats_string(virtual_block: VirtualBlock, detailed_map: bool) -> *mut c_char {
-    let mut stats_string = ptr::null_mut::<c_char>();
-    ffi::vmaBuildVirtualBlockStatsString(virtual_block.as_raw() as _, &mut stats_string, detailed_map as _);
-    stats_string
+    let mut stats_string = MaybeUninit::uninit();
+    ffi::vmaBuildVirtualBlockStatsString(virtual_block.as_raw() as _, &mut stats_string as *mut _ as *mut _, detailed_map as _);
+    stats_string.assume_init()
 }
 
 #[inline]
@@ -602,9 +596,9 @@ pub unsafe fn free_virtual_block_stats_string(virtual_block: VirtualBlock, stats
 
 #[inline]
 pub unsafe fn build_stats_string(allocator: Allocator, detailed_map: bool) -> *mut c_char {
-    let mut stats_string = ptr::null_mut::<c_char>();
-    ffi::vmaBuildStatsString(allocator.as_raw() as _, &mut stats_string, detailed_map as _);
-    stats_string
+    let mut stats_string = MaybeUninit::uninit();
+    ffi::vmaBuildStatsString(allocator.as_raw() as _, &mut stats_string as *mut _ as *mut _, detailed_map as _);
+    stats_string.assume_init()
 }
 
 #[inline]

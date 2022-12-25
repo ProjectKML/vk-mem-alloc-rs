@@ -1,6 +1,6 @@
 [package]
-name = "vk-mem-alloc"
-version = "0.1.1"
+name = "vk-mem-alloc-sys"
+version = "0.2.0"
 edition = "2021"
 
 authors = [ "Lorenz Klaus <beastle9end@outlook.de>", "Marlon Klaus <marlon.klaus@icloud.com>" ]
@@ -12,13 +12,27 @@ readme = "README.md"
 keywords = [ "vulkan", "vk", "ash", "memory", "allocator" ]
 categories = [ "api-bindings", "rendering", "rendering::engine", "rendering::graphics-api" ]
 license = "MIT/Apache-2.0"
+build = "build.rs"
 include = [
     "src/*.rs",
+    "target/bindings.rs",
+    "build.rs",
     "Cargo.toml",
+    "vendor/VulkanMemoryAllocator/include/vk_mem_alloc.h",
+    "vendor/Vulkan-Headers/include/vulkan/vk_platform.h",
+    "vendor/Vulkan-Headers/include/vulkan/vulkan_core.h",
+    "vendor/Vulkan-Headers/include/vulkan/vulkan.h",
+    "wrapper/vk_mem_alloc.cpp"
 ]
 
 [dependencies]
 ash = { git = "https://github.com/ProjectKML/ash" }
-bitflags = "2.0.0-rc.1"
-libc = "0.2.129"
-vk-mem-alloc-sys = { path = "vk-mem-alloc-sys"}
+
+[build-dependencies]
+bindgen = "0.63.0"
+cc = "1.0.78"
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1

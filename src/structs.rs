@@ -1,6 +1,6 @@
 use std::{
-    mem,
-    os::raw::{c_char, c_void}
+    ffi::{c_char, c_void},
+    mem
 };
 
 use ash::vk;
@@ -18,7 +18,7 @@ pub struct DeviceMemoryCallbacks {
 impl Default for DeviceMemoryCallbacks {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }
 
@@ -72,7 +72,7 @@ pub struct AllocatorCreateInfo<'a> {
 impl<'a> Default for AllocatorCreateInfo<'a> {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }
 
@@ -136,7 +136,7 @@ pub struct AllocationCreateInfo {
 impl Default for AllocationCreateInfo {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }
 
@@ -156,7 +156,7 @@ pub struct PoolCreateInfo {
 impl Default for PoolCreateInfo {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }
 
@@ -175,7 +175,7 @@ pub struct AllocationInfo {
 impl Default for AllocationInfo {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }
 
@@ -199,7 +199,7 @@ pub struct DefragmentationMove {
 impl Default for DefragmentationMove {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }
 
@@ -237,7 +237,7 @@ pub struct VirtualBlockCreateInfo<'a> {
 impl<'a> Default for VirtualBlockCreateInfo<'a> {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }
 
@@ -253,7 +253,7 @@ pub struct VirtualAllocationCreateInfo {
 impl Default for VirtualAllocationCreateInfo {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }
 
@@ -268,6 +268,6 @@ pub struct VirtualAllocationInfo {
 impl Default for VirtualAllocationInfo {
     #[inline]
     fn default() -> Self {
-        unsafe { mem::zeroed::<Self>() }
+        unsafe { mem::zeroed() }
     }
 }

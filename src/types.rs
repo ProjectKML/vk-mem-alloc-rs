@@ -1,15 +1,12 @@
-use std::os::raw::c_void;
+use std::ffi::c_void;
 
 use ash::vk;
 
 macro_rules! define_handle {
     ($name: ident) => {
         #[repr(transparent)]
-        #[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Copy, Hash)]
+        #[derive(Clone, Copy, PartialEq, Eq, Hash)]
         pub struct $name(*mut u8);
-
-        unsafe impl Send for $name {}
-        unsafe impl Sync for $name {}
 
         impl Default for $name {
             #[inline]
@@ -17,6 +14,9 @@ macro_rules! define_handle {
                 Self::null()
             }
         }
+
+        unsafe impl Send for $name {}
+        unsafe impl Sync for $name {}
 
         impl $name {
             #[inline]
@@ -53,8 +53,15 @@ macro_rules! define_handle {
 macro_rules! define_non_dispatchable_handle {
     ($name: ident) => {
         #[repr(transparent)]
-        #[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Copy, Hash, Default)]
+        #[derive(Clone, Copy, PartialEq, Eq, Hash)]
         pub struct $name(u64);
+
+        impl Default for $name {
+            #[inline]
+            fn default() -> Self {
+                Self::null()
+            }
+        }
 
         impl $name {
             #[inline]
