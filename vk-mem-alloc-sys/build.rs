@@ -57,7 +57,7 @@ fn main() {
 
     build
         .cpp(true)
-        .flag("-I./vendor/VulkanMemoryAllocator/include")
+        .include("vendor/VulkanMemoryAllocator/include")
         .flag("-Wno-missing-field-initializers")
         .flag("-Wno-nullability-completeness")
         .flag("-Wno-unused-parameter")
