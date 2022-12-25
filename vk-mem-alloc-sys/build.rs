@@ -1,5 +1,5 @@
-use std::path::Path;
-use std::fs;
+use std::{fs, path::Path};
+
 use bindgen::callbacks::ParseCallbacks;
 
 #[derive(Debug)]
@@ -35,22 +35,22 @@ fn generate_bindings() {
         .generate()
         .expect("Failed to generate bindings");
 
-    let bindings_str = bindings.to_string().replace(" AllocationCallbacks", " AllocationCallbacks<'a>")
+    let bindings_str = bindings
+        .to_string()
+        .replace(" AllocationCallbacks", " AllocationCallbacks<'a>")
         .replace(" VmaAllocatorCreateInfo", " VmaAllocatorCreateInfo<'a>")
         .replace(" VmaVirtualBlockCreateInfo", " VmaVirtualBlockCreateInfo<'a>")
         .replace("vmaCreateAllocator", "vmaCreateAllocator<'a>")
         .replace("vmaCreateVirtualBlock", "vmaCreateVirtualBlock<'a>");
 
     fs::create_dir_all("gen").unwrap();
-    fs::write(Path::new("gen/bindings.rs"), bindings_str)
-        .expect("Failed to write bindings to file");
+    fs::write(Path::new("gen/bindings.rs"), bindings_str).expect("Failed to write bindings to file");
 }
 
 fn main() {
     let mut build = cc::Build::new();
 
-    build.define("VMA_STATIC_VULKAN_FUNCTIONS", "0")
-        .define("VMA_DYNAMIC_VULKAN_FUNCTIONS", "0");
+    build.define("VMA_STATIC_VULKAN_FUNCTIONS", "0").define("VMA_DYNAMIC_VULKAN_FUNCTIONS", "0");
 
     #[cfg(feature = "recording")]
     build.define("VMA_RECORDING_ENABLED", "1");
