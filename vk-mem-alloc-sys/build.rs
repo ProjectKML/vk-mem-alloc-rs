@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::fs;
 use bindgen::callbacks::ParseCallbacks;
 
 #[derive(Debug)]
@@ -40,7 +41,8 @@ fn generate_bindings() {
         .replace("vmaCreateAllocator", "vmaCreateAllocator<'a>")
         .replace("vmaCreateVirtualBlock", "vmaCreateVirtualBlock<'a>");
 
-    std::fs::write(Path::new("target/bindings.rs"), bindings_str)
+    fs::create_dir_all("gen").unwrap();
+    fs::write(Path::new("gen/bindings.rs"), bindings_str)
         .expect("Failed to write bindings to file");
 }
 

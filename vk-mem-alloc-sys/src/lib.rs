@@ -3,4 +3,4 @@
 #![allow(non_snake_case)]
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::unreadable_literal))]
 
-include!("../target/bindings.rs");
+include!("../gen/bindings.rs");
