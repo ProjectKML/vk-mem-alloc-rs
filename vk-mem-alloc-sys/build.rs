@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{env, fs, path::Path};
 
 use bindgen::callbacks::ParseCallbacks;
 
@@ -55,17 +55,25 @@ fn main() {
     #[cfg(feature = "recording")]
     build.define("VMA_RECORDING_ENABLED", "1");
 
+    let target = env::var("TARGET").unwrap();
+
+    if target.contains("gnu") || target.contains("darwin") {
+        build
+            .flag("-std=c++17")
+            .flag("-Wno-missing-field-initializers")
+            .flag("-Wno-nullability-completeness")
+            .flag("-Wno-unused-parameter")
+            .flag("-Wno-unused-variable")
+            .flag("-Wno-parentheses")
+            .flag("-Wno-implicit-fallthrough");
+    }
+
     build
         .cpp(true)
+        .include("vendor/Vulkan-Headers/include")
         .include("vendor/VulkanMemoryAllocator/include")
-        .flag("-Wno-missing-field-initializers")
-        .flag("-Wno-nullability-completeness")
-        .flag("-Wno-unused-parameter")
-        .flag("-Wno-unused-variable")
-        .flag("-std=c++17")
-        .file("wrapper/vk_mem_alloc.cpp");
-
-    build.compile("vk_mem_alloc_sys_cc");
+        .file("wrapper/vk_mem_alloc.cpp")
+        .compile("vk_mem_alloc_sys_cc");
 
     generate_bindings();
 }
