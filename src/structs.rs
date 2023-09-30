@@ -202,12 +202,20 @@ impl Default for AllocationInfo {
 assert_size_and_align!(AllocationInfo, ffi::VmaAllocationInfo);
 
 #[repr(C)]
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug)]
 pub struct DefragmentationInfo {
     pub flags: DefragmentationFlags,
     pub pool: Pool,
     pub max_bytes_per_pass: vk::DeviceSize,
-    pub max_allocations_per_pass: u32
+    pub max_allocations_per_pass: u32,
+    pub pfn_break_callback: PfnCheckDefragmentationBreakFunction,
+    pub pfn_break_callback_userdata: *mut c_void
+}
+
+impl Default for DefragmentationInfo {
+    fn default() -> Self {
+        unsafe { mem::zeroed() }
+    }
 }
 
 assert_size_and_align!(DefragmentationInfo, ffi::VmaDefragmentationInfo);

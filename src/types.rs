@@ -13,3 +13,5 @@ define_handle!(VirtualBlock);
 
 pub type PfnAllocateDeviceMemoryFunction = Option<unsafe extern "C" fn(allocator: Allocator, memory_type: u32, memory: vk::DeviceMemory, size: vk::DeviceSize, user_data: *mut c_void)>;
 pub type PfnFreeDeviceMemoryFunction = Option<unsafe extern "C" fn(allocator: Allocator, memory_type: u32, memory: vk::DeviceMemory, size: vk::DeviceSize, user_data: *mut c_void)>;
+
+pub type PfnCheckDefragmentationBreakFunction = Option<unsafe extern "C" fn(pUserData: *mut c_void) -> vk::Bool32>;
