@@ -23,7 +23,7 @@ include = [
 ]
 
 [dependencies]
-ash = { git = "https://github.com/ProjectKML/ash" }
+ash = { git = "https://github.com/ash-rs/ash", branch = "rwh-0.6" }
 
 [build-dependencies]
 bindgen = "0.63.0"

@@ -18,7 +18,7 @@ include = [
 ]
 
 [dependencies]
-ash = { git = "https://github.com/ProjectKML/ash" }
+ash = { git = "https://github.com/ash-rs/ash", branch = "rwh-0.6" }
 bitflags = "2.0.0-rc.1"
 libc = "0.2.129"
 static_assertions = "1.1.0"
