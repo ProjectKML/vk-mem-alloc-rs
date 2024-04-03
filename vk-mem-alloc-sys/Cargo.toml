@@ -23,11 +23,11 @@ include = [
 ]
 
 [dependencies]
-ash = { git = "https://github.com/ProjectKML/ash" }
+ash = "0.38.0+1.3.281"
 
 [build-dependencies]
-bindgen = "0.63.0"
-cc = "1.0.78"
+bindgen = "0.69.4"
+cc = "1.0.90"
 
 [features]
 recording = []

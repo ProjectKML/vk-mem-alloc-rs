@@ -1,5 +1,6 @@
 use std::{env, fs, path::Path};
 
+use bindgen::Formatter;
 use bindgen::callbacks::ParseCallbacks;
 
 #[derive(Debug)]
@@ -22,7 +23,7 @@ fn generate_bindings() {
         .clang_arg("I./wrapper")
         .clang_arg("-I./vendor/Vulkan-Headers/include")
         .header("vendor/VulkanMemoryAllocator/include/vk_mem_alloc.h")
-        .rustfmt_bindings(true)
+        .formatter(Formatter::Rustfmt)
         .size_t_is_usize(true)
         .allowlist_function("vma.*")
         .allowlist_function("PFN_vma.*")
